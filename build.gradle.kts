@@ -22,22 +22,33 @@ repositories {
 	mavenCentral()
 }
 
+object DependencyVersion {
+	const val SPRINGDOC_VERSION = "2.0.0"
+	const val KOTEST_VERSION = "5.7.2"
+	const val KOTEST_EXTENSION_VERSION = "1.1.2"
+	const val MOCKK_VERSION = "1.13.8"
+}
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.0")
-	implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.0.0")
+
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${DependencyVersion.SPRINGDOC_VERSION}")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:${DependencyVersion.SPRINGDOC_VERSION}")
+
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")
 	runtimeOnly("com.mysql:mysql-connector-j")
 
+	implementation("org.springframework.boot:spring-boot-starter-hateoas")
+
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("io.kotest:kotest-runner-junit5:5.7.2")
-	testImplementation("io.kotest:kotest-assertions-core:5.7.2")
-	testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2")
-	testImplementation("io.mockk:mockk:1.13.8")
+	testImplementation("io.kotest:kotest-runner-junit5:${DependencyVersion.KOTEST_VERSION}")
+	testImplementation("io.kotest:kotest-assertions-core:${DependencyVersion.KOTEST_VERSION}")
+	testImplementation("io.kotest.extensions:kotest-extensions-spring:${DependencyVersion.KOTEST_EXTENSION_VERSION}")
+	testImplementation("io.mockk:mockk:${DependencyVersion.MOCKK_VERSION}")
 }
 
 tasks.withType<KotlinCompile> {

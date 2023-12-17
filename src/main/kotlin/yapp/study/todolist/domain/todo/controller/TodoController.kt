@@ -5,48 +5,50 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
-import yapp.study.todolist.common.response.PageResponse
-import yapp.study.todolist.domain.todo.dto.TodoCommentDto
+import yapp.study.todolist.common.extension.*
 import yapp.study.todolist.domain.todo.dto.TodoDetailDto
-import yapp.study.todolist.domain.todo.dto.TodoDto
 import yapp.study.todolist.domain.todo.service.TodoService
 
 @RestController
 @RequestMapping(value = ["/v1/todos"],
-//        consumes = [MediaType.APPLICATION_JSON_VALUE],
-        produces = [MediaType.APPLICATION_JSON_VALUE])
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+)
 class TodoController(
         private val todoService: TodoService
 ) {
     @PostMapping
-    fun createTodo(@RequestBody todoDetailDto: TodoDetailDto) {
-        todoService.createTodo(todoDetailDto)
-    }
+    fun createTodo(@RequestBody todoDetailDto: TodoDetailDto) = todoService.createTodo(todoDetailDto).let {
+        Unit.toTodoModel(it)
+    }.wrapCreated()
 
     @GetMapping
-    fun getTodos(@ParameterObject @PageableDefault(size = 10) pageable: Pageable): PageResponse<TodoDto> {
-        return todoService.getTodos(pageable)
-    }
+    fun getTodos(@ParameterObject @PageableDefault(size = 10) pageable: Pageable) =
+        todoService.getTodos(pageable)
+            .toTodoListModel()
+            .wrapOk()
 
     @PatchMapping("/{id}")
-    fun updateTodo(@PathVariable("id") id: Long,
-                   @RequestBody todoDetailDto: TodoDetailDto) {
-        todoService.updateTodo(id, todoDetailDto)
-    }
+    fun updateTodo(
+        @PathVariable("id") id: Long,
+        @RequestBody todoDetailDto: TodoDetailDto,
+    ) = todoService.updateTodo(id, todoDetailDto)
+        .toTodoModel(id)
+        .wrapCreated()
 
     @DeleteMapping("/{id}")
-    fun deleteTodo(@PathVariable("id") id: Long) {
-        todoService.deleteTodo(id);
-    }
+    fun deleteTodo(@PathVariable("id") id: Long) = todoService.deleteTodo(id)
+        .wrapVoid()
 
     @PatchMapping("/{id}/done")
-    fun updateTodoDone(@PathVariable("id") id: Long,
-                       @RequestParam("done") done: Boolean) {
-        todoService.updateDoneTodo(id, done)
-    }
+    fun updateTodoDone(
+        @PathVariable("id") id: Long,
+        @RequestParam("done") done: Boolean
+    ) = todoService.updateDoneTodo(id, done)
+        .toTodoModel(id)
+        .wrapCreated()
 
     @GetMapping("/{id}/comments")
-    fun getTodoWithComments(@PathVariable("id") id: Long): Map<Int, TodoCommentDto> {
-        return mapOf(200 to todoService.getTodoWithComments(id))
-    }
+    fun getTodoWithComments(@PathVariable("id") id: Long) = todoService.getTodoWithComments(id)
+        .toTodoModel(id)
+        .wrapOk()
 }
