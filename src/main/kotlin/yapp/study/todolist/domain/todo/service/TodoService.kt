@@ -14,12 +14,14 @@ import yapp.study.todolist.domain.todo.dto.TodoDetailDto
 import yapp.study.todolist.domain.todo.dto.TodoDto
 import yapp.study.todolist.domain.todo.entity.Todo
 import yapp.study.todolist.domain.todo.repository.TodoRepository
+import yapp.study.todolist.domain.viewer.service.ViewerAsyncService
 
 @Service
 class TodoService(
-        private val categoryRepository: CategoryRepository,
-        private val todoRepository: TodoRepository,
-        private val commentRepository: CommentRepository,
+    private val categoryRepository: CategoryRepository,
+    private val todoRepository: TodoRepository,
+    private val commentRepository: CommentRepository,
+    private val viewerAsyncService: ViewerAsyncService,
 ) {
     @Transactional
     fun createTodo(todoDetailDto: TodoDetailDto): Long {
@@ -32,7 +34,9 @@ class TodoService(
 
     @Transactional(readOnly = true)
     fun getTodos(pageable: Pageable): PageResponse<TodoDto> {
-        return PageResponse.toResponse(todoRepository.findAll(pageable).map {TodoDto.toDto(it)})
+        val results = todoRepository.findAll(pageable).map {TodoDto.toDto(it)}
+        viewerAsyncService.asyncUpdateCount(true)
+        return PageResponse.toResponse(results)
     }
 
     @Transactional
@@ -71,6 +75,7 @@ class TodoService(
     fun getTodoWithComments(id: Long): TodoCommentDto {
         val todo = todoRepository.findByIdOrNull(id) ?: throw NotFoundException("not exist todo")
         val comments = commentRepository.findAllByTodoId(id).map { CommentDto.toDto(it) }
+        viewerAsyncService.asyncUpdateCount(true)
         return TodoCommentDto.toDto(todo, comments)
     }
 }

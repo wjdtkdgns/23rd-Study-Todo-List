@@ -1,16 +1,18 @@
 package yapp.study.todolist.domain.viewer.service
 
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import yapp.study.todolist.common.adaptor.syncAdaptor
 import yapp.study.todolist.domain.viewer.entity.ViewerCount
 import yapp.study.todolist.domain.viewer.repository.ViewerCountRepository
 
 @Service
-class ViewerService(
+class ViewerAsyncService(
     private val viewerCountRepository: ViewerCountRepository,
 ) {
-    fun updateCount(increase: Boolean) {
+    @Async
+    fun asyncUpdateCount(increase: Boolean) {
         syncAdaptor {
             viewerCountRepository.findByIdOrNull(1)
                 ?. let {
@@ -22,16 +24,6 @@ class ViewerService(
                     viewerCountRepository.save(it)
                 }
                 ?: viewerCountRepository.save(ViewerCount())
-        }
-    }
-
-    fun extendTtl() {
-        syncAdaptor {
-            viewerCountRepository.findByIdOrNull(1)
-                ?.let {
-                    it.extendTtl()
-                    viewerCountRepository.save(it)
-                }
         }
     }
 }

@@ -10,14 +10,15 @@ import yapp.study.todolist.domain.viewer.service.ViewerService
 class ViewerController(
     private val viewerService: ViewerService
 ) {
-    @PatchMapping("{id}")
-    fun updateCount(@PathVariable("id") id: Long,
-                    @RequestParam("increase") increase: Boolean) {
-        viewerService.updateCount(increase, id)
+    @PatchMapping
+    fun updateCount(
+                    @RequestParam("increase") increase: Boolean
+    ) {
+        viewerService.updateCount(increase)
     }
 
-    @PatchMapping("{id}/extends")
-    fun extendTtl(@PathVariable("id") id: Long) {
-        viewerService.extendTtl(id)
+    @PatchMapping("/extends")
+    fun extendTtl() {
+        viewerService.extendTtl()
     }
 }
