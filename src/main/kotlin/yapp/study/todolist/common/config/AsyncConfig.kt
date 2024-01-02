@@ -12,10 +12,21 @@ import java.util.concurrent.ThreadPoolExecutor
 
 @EnableAsync
 @Configuration
-class AsyncConfig : AsyncConfigurer {
+class AsyncConfig {
 
     @Bean
     fun archivingContentCntTaskExecutor(): Executor {
+        return ThreadPoolTaskExecutor().apply {
+            corePoolSize = 1
+            maxPoolSize = 2
+            queueCapacity = 10
+            setRejectedExecutionHandler(ThreadPoolExecutor.CallerRunsPolicy())
+            initialize()
+        }
+    }
+
+    @Bean
+    fun testTaskExecutor(): Executor {
         return ThreadPoolTaskExecutor().apply {
             corePoolSize = 1
             maxPoolSize = 2
